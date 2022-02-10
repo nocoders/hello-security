@@ -23,18 +23,31 @@ class HelloSecurityApplicationTests {
 	/*数据插入*/
 	@Test
 	void contextLoads() {
-		User user = new User();
-		user.setUsername("root");
-		user.setPassword("root");
-		Role role = new Role();
-		role.setName("ROLE_admin");
-		role.setNamezh("管理员");
-		userMapper.insertSelective(user);
-		roleMapper.insert(role);
-		UserRole userRole = new UserRole();
-		userRole.setUserId(user.getId());
-		userRole.setRoleId(role.getId());
-		userRoleMapper.insert(userRole);
+//		User user = new User();
+//		user.setUsername("root");
+//		user.setPassword("root");
+//		Role role = new Role();
+//		role.setName("ROLE_admin");
+//		role.setNamezh("管理员");
+//		userMapper.insertSelective(user);
+//		roleMapper.insert(role);
+//		UserRole userRole = new UserRole();
+//		userRole.setUserId(user.getId());
+//		userRole.setRoleId(role.getId());
+//		userRoleMapper.insert(userRole);
+
+		User user2 = new User();
+		user2.setUsername("linmeng");
+		user2.setPassword("123456");
+		Role role2 = new Role();
+		role2.setName("ROLE_user");
+		role2.setNamezh("用户");
+		userMapper.insertSelective(user2);
+		roleMapper.insert(role2);
+		UserRole userRole2 = new UserRole();
+		userRole2.setUserId(user2.getId());
+		userRole2.setRoleId(role2.getId());
+		userRoleMapper.insert(userRole2);
 	}
 
 }

@@ -21,7 +21,9 @@
         <javaClientGenerator targetPackage="example.hellosecurity.mapper" targetProject="src/main/java"/>
 
         <table tableName="%">
-            <!--获取生成的主键id-->
+            <!--获取生成的主键id sqlStatement也可以使用自定义的方法
+            eg:sqlStatement="select ${@com.cmcc.coc.lightweight.common.common.utils.IdWorker@nextId()} from dual"
+            -->
             <generatedKey column="id" sqlStatement="MySql" identity="true"/>
         </table>
         <!--执行命令mvn -Dmybatis.generator.configurationFile=src/main/resources/mybatis-generator/generatorConfig.xml mybatis-generator:generate-->

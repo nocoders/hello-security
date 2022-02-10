@@ -1,5 +1,6 @@
 package example.hellosecurity.config;
 
+import example.hellosecurity.filter.VerifyCodeFilter;
 import example.hellosecurity.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -10,12 +11,14 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.sql.DataSource;
 
@@ -27,6 +30,7 @@ import javax.sql.DataSource;
  */
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    /* 白名单集合*/
     @Autowired
     DataSource dataSource;
 
@@ -85,18 +89,35 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/admin/**").hasRole("admin")// 角色设置请求路径权限
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = http.authorizeRequests();
+        //不需要保护的资源路径允许访问
+        for (String url : ignoreUrlsConfig().getUrls()) {
+            registry.antMatchers(url).permitAll();
+        }
+        // 角色设置请求路径权限
+        registry.antMatchers("/admin/**").hasRole("admin")// 角色设置请求路径权限
                 .antMatchers("/user/**").hasRole("user")
-                .anyRequest().authenticated()// 要放到后面 否则会抛异常
-                .and()
-                .formLogin()
+                .anyRequest().authenticated();// 要放到后面 否则会抛异常
+        // 登录请求不拦截，关闭csrf
+        http.formLogin()
                 .loginPage("/login.html")// 前段页面
                 .loginProcessingUrl("/doLogin")// 后端接口
                 .usernameParameter("name")//页面填入参数用户名字段名
-                .passwordParameter("pass")//页面填入参数密码
+                .passwordParameter("pass")//页面填入参数密码 请求时参数要正确，否则无法拦截到
                 .permitAll() // 登录请求不拦截
                 .and()
-                .csrf().disable();// 关闭csrf
+                .csrf().disable() // 关闭csrf
+                // 开启验证码过滤
+                .addFilterBefore(verifyCodeFilter(), UsernamePasswordAuthenticationFilter.class);
+    }
+
+    @Bean
+    public IgnoreUrlsConfig ignoreUrlsConfig() {
+        return new IgnoreUrlsConfig();
+    }
+
+    @Bean
+    public VerifyCodeFilter verifyCodeFilter(){
+        return new VerifyCodeFilter();
     }
 }
