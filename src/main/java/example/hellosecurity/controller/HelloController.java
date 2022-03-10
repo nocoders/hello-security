@@ -1,5 +1,8 @@
 package example.hellosecurity.controller;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,4 +26,16 @@ public class HelloController {
     public String userHello(){
         return "user hello world";
     }
+
+    @GetMapping("/hello1")
+    public String hello1() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        Authentication a = context.getAuthentication();
+        return "Hello, " + a.getName() + "!";
+    }
+    @GetMapping("/hello2")
+    public String hello2(Authentication a) {
+        return "Hello, " + a.getName() + "!";
+    }
+
 }

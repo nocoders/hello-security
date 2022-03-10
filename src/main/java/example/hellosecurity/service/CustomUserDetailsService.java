@@ -34,7 +34,7 @@ import static org.mybatis.dynamic.sql.SqlBuilder.*;
  * @date 2022年1月29日 15:02
  */
 @Component
-public class UserService implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UserMapper userMapper;
